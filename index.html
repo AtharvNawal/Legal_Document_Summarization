@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Legal Document Summarizer</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        .highlight {
+            background-color: rgba(254, 240, 138, 0.5);
+            padding: 1px 2px;
+            border-radius: 2px;
+        }
+        .summary-tab.active {
+            border-bottom: 3px solid #2563eb;
+            color: #2563eb;
+        }
+        .language-dropdown {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out;
+        }
+        .language-dropdown.show {
+            max-height: 300px;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <header class="bg-white shadow-sm">
+        <div class="container mx-auto px-4 py-4 flex justify-between items-center">
+            <div class="flex items-center">
+                <i class="fas fa-balance-scale text-blue-600 text-2xl mr-3"></i>
+                <h1 class="text-xl font-bold text-gray-800">Legal Document Summarizer</h1>
+            </div>
+            <div class="flex items-center space-x-4">
+                <button id="historyBtn" class="text-gray-600 hover:text-blue-600">
+                    <i class="fas fa-history mr-1"></i> History
+                </button>
+                <button id="settingsBtn" class="text-gray-600 hover:text-blue-600">
+                    <i class="fas fa-cog mr-1"></i> Settings
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="container mx-auto px-4 py-6">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <!-- Left Panel - Document Upload -->
+            <div class="lg:col-span-1 bg-white rounded-lg shadow p-6">
+                <h2 class="text-lg font-semibold mb-4">Document Input</h2>
+                
+                <!-- File Upload Section -->
+                <div class="mb-6">
+                    <div class="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-blue-500 transition duration-300">
+                        <i class="fas fa-file-upload text-gray-400 text-4xl mb-3"></i>
+                        <p class="text-gray-600 mb-2">Drag & drop files here or</p>
+                        <label class="inline-block px-4 py-2 bg-blue-600 text-white rounded cursor-pointer hover:bg-blue-700 transition">
+                            Browse Files
+                            <input type="file" class="hidden" accept=".pdf,.docx,.doc,.txt" multiple>
+                        </label>
+                        <p class="text-xs text-gray-500 mt-2">Supported formats: PDF, DOCX, TXT</p>
+                    </div>
+                </div>
+
+                <!-- Document Queue -->
+                <div class="mb-6">
+                    <h3 class="text-md font-medium mb-2">Upload Queue</h3>
+                    <div class="space-y-3">
+                        <div class="flex items-center justify-between p-3 bg-gray-50 rounded border">
+                            <div class="flex items-center">
+                                <i class="fas fa-file-pdf text-red-500 mr-2"></i>
+                                <span class="text-sm">Environmental Policy 2023.pdf</span>
+                            </div>
+                            <div class="flex items-center">
+                                <span class="text-xs text-green-600">Processed</span>
+                                <button class="ml-2 text-gray-400 hover:text-gray-600">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="flex items-center justify-between p-3 bg-gray-50 rounded border">
+                            <div class="flex items-center">
+                                <i class="fas fa-file-word text-blue-500 mr-2"></i>
+                                <span class="text-sm">Human Rights Act.docx</span>
+                            </div>
+                            <div class="flex items-center">
+                                <div class="w-16 bg-gray-200 rounded-full h-2">
+                                    <div class="bg-blue-600 h-2 rounded-full" style="width: 75%"></div>
+                                </div>
+                                <span class="text-xs text-gray-600 ml-2">75%</span>
+                                <button class="ml-2 text-gray-400 hover:text-gray-600">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Processing Options -->
+                <div>
+                    <h3 class="text-md font-medium mb-3">Processing Options</h3>
+                    <div class="space-y-3">
+                        <div>
+                            <label class="flex items-center">
+                                <input type="checkbox" class="rounded text-blue-600" checked>
+                                <span class="ml-2 text-sm">Keyword Highlighting</span>
+                            </label>
+                        </div>
+                        <div>
+                            <label class="flex items-center">
+                                <input type="checkbox" class="rounded text-blue-600" checked>
+                                <span class="ml-2 text-sm">Generate Actionable Insights</span>
+                            </label>
+                        </div>
+                        <div>
+                            <label class="flex items-center">
+                                <input type="checkbox" class="rounded text-blue-600">
+                                <span class="ml-2 text-sm">Include Source References</span>
+                            </label>
+                        </div>
+
+                        <div class="mt-4">
+                            <label class="block text-sm mb-1">Summary Length</label>
+                            <select class="w-full p-2 border rounded text-sm">
+                                <option>Brief (10% of original)</option>
+                                <option selected>Moderate (25% of original)</option>
+                                <option>Detailed (40% of original)</option>
+                            </select>
+                        </div>
+
+                        <div class="mt-4">
+                            <label class="block text-sm mb-1">Target Audience</label>
+                            <select class="w-full p-2 border rounded text-sm">
+                                <option>General Public</option>
+                                <option selected>NGO Staff</option>
+                                <option>Legal Professionals</option>
+                                <option>Policy Makers</option>
+                            </select>
+                        </div>
+
+                        <div class="relative mt-4">
+                            <button id="languageBtn" class="w-full flex justify-between items-center p-2 border rounded text-sm">
+                                <span>English (Default)</span>
+                                <i class="fas fa-chevron-down"></i>
+                            </button>
+                            <div id="languageDropdown" class="language-dropdown absolute z-10 w-full mt-1 bg-white border rounded shadow-lg">
+                                <div class="p-2 hover:bg-gray-100 cursor-pointer">English (Default)</div>
+                                <div class="p-2 hover:bg-gray-100 cursor-pointer">Hindi</div>
+                                <div class="p-2 hover:bg-gray-100 cursor-pointer">Spanish</div>
+                                <div class="p-2 hover:bg-gray-100 cursor-pointer">French</div>
+                                <div class="p-2 hover:bg-gray-100 cursor-pointer">German</div>
+                                <div class="p-2 hover:bg-gray-100 cursor-pointer">Chinese</div>
+                                <div class="p-2 hover:bg-gray-100 cursor-pointer">Arabic</div>
+                            </div>
+                        </div>
+
+                        <button class="w-full mt-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition">
+                            Process Documents
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Panel - Summary Results -->
+            <div class="lg:col-span-2 bg-white rounded-lg shadow">
+                <div class="p-6 border-b">
+                    <div class="flex justify-between items-center">
+                        <h2 class="text-lg font-semibold">Environmental Policy 2023.pdf</h2>
+                        <div class="flex space-x-2">
+                            <button class="p-2 text-gray-600 hover:text-blue-600">
+                                <i class="fas fa-download"></i>
+                            </button>
+                            <button class="p-2 text-gray-600 hover:text-blue-600">
+                                <i class="fas fa-print"></i>
+                            </button>
+                            <button class="p-2 text-gray-600 hover:text-blue-600">
+                                <i class="fas fa-share-alt"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="flex space-x-4 mt-4">
+                        <button class="summary-tab active py-2 px-3 text-sm font-medium">Summary</button>
+                        <button class="summary-tab py-2 px-3 text-sm font-medium text-gray-600">Key Points</button>
+                        <button class="summary-tab py-2 px-3 text-sm font-medium text-gray-600">Action Items</button>
+                        <button class="summary-tab py-2 px-3 text-sm font-medium text-gray-600">Q&A</button>
+                    </div>
+                </div>
+
+                <!-- Summary Content -->
+                <div class="p-6">
+                    <div class="flex justify-between items-center mb-4">
+                        <div class="flex items-center">
+                            <span class="text-sm mr-2">Readability:</span>
+                            <span class="inline-block px-2 py-1 bg-green-100 text-green-800 text-xs rounded">Easy to understand</span>
+                        </div>
+                        <div class="flex items-center">
+                            <span class="text-sm mr-2">Confidence:</span>
+                            <span class="inline-block px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded">High (94%)</span>
+                        </div>
+                    </div>
+
+                    <!-- Summary Text -->
+                    <div class="prose max-w-none">
+                        <p class="mb-4">
+                            The Environmental Policy of 2023 establishes a comprehensive framework for <span class="highlight">sustainable development</span> and environmental protection across all sectors. This policy represents a significant update from the 2015 version, with strengthened provisions for <span class="highlight">carbon emissions reduction</span> and climate adaptation.
+                        </p>
+                        
+                        <p class="mb-4">
+                            Key objectives include achieving <span class="highlight">carbon neutrality by 2050</span> through phased reductions in greenhouse gas emissions, expanding protected ecosystems to cover 30% of land and marine areas by 2030, and implementing a circular economy framework to minimize waste generation and resource consumption.
+                        </p>
+                        
+                        <p class="mb-4">
+                            The policy mandates that <span class="highlight">all new development projects</span> undergo rigorous environmental impact assessments, with special provisions for projects affecting indigenous lands or ecologically sensitive areas. Public and private entities with annual revenues exceeding $10 million must submit <span class="highlight">annual environmental compliance reports</span> detailing their adherence to policy guidelines.
+                        </p>
+                        
+                        <p class="mb-4">
+                            Enforcement mechanisms include a graduated penalty system for non-compliance, with fines ranging from 1% to 5% of annual revenue for serious violations. The policy also establishes an <span class="highlight">independent Environmental Oversight Committee</span> to monitor implementation and recommend adjustments as needed.
+                        </p>
+                        
+                        <p class="mb-4">
+                            Of particular relevance to NGOs is Section 17, which outlines opportunities for civil society partnerships in environmental monitoring and conservation efforts, including dedicated funding streams for community-based initiatives.
+                        </p>
+                    </div>
+
+                    <!-- Source Reference -->
+                    <div class="mt-6 p-3 bg-gray-50 rounded text-sm">
+                        <div class="font-medium mb-1">Source References:</div>
+                        <ul class="list-disc list-inside space-y-1 text-gray-700">
+                            <li>Carbon neutrality target: Section 4.2, Page 17</li>
+                            <li>Environmental impact assessments: Section 8.5, Pages 43-46</li>
+                            <li>Compliance reporting: Section 12.3, Pages 78-80</li>
+                            <li>Civil society partnerships: Section 17, Pages 112-118</li>
+                        </ul>
+                    </div>
+
+                    <!-- Related Documents -->
+                    <div class="mt-6">
+                        <h3 class="text-md font-medium mb-2">Related Documents</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                            <div class="p-3 border rounded flex items-center">
+                                <i class="fas fa-file-pdf text-red-500 mr-2"></i>
+                                <span class="text-sm">Climate Action Plan 2022-2030</span>
+                            </div>
+                            <div class="p-3 border rounded flex items-center">
+                                <i class="fas fa-file-alt text-gray-500 mr-2"></i>
+                                <span class="text-sm">Waste Management Guidelines</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Question Section -->
+        <div class="mt-6 bg-white rounded-lg shadow p-6">
+            <h2 class="text-lg font-semibold mb-4">Ask Questions About This Document</h2>
+            <div class="flex">
+                <input type="text" placeholder="E.g., What are the penalties for non-compliance?" class="flex-1 p-3 border rounded-l focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <button class="bg-blue-600 text-white px-4 rounded-r hover:bg-blue-700 transition">
+                    <i class="fas fa-search"></i>
+                </button>
+            </div>
+
+            <!-- Sample Questions -->
+            <div class="mt-4 flex flex-wrap gap-2">
+                <span class="inline-block px-3 py-1 bg-gray-100 rounded-full text-sm cursor-pointer hover:bg-gray-200">
+                    What are the key deadlines?
+                </span>
+                <span class="inline-block px-3 py-1 bg-gray-100 rounded-full text-sm cursor-pointer hover:bg-gray-200">
+                    How does this affect small businesses?
+                </span>
+                <span class="inline-block px-3 py-1 bg-gray-100 rounded-full text-sm cursor-pointer hover:bg-gray-200">
+                    Define "sustainable development"
+                </span>
+                <span class="inline-block px-3 py-1 bg-gray-100 rounded-full text-sm cursor-pointer hover:bg-gray-200">
+                    Funding opportunities for NGOs
+                </span>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Simple toggle for language dropdown
+        document.getElementById('languageBtn').addEventListener('click', function() {
+            document.getElementById('languageDropdown').classList.toggle('show');
+        });
+
+        // Close dropdown when clicking outside
+        window.addEventListener('click', function(e) {
+            if (!document.getElementById('languageBtn').contains(e.target)) {
+                document.getElementById('languageDropdown').classList.remove('show');
+            }
+        });
+
+        // Tab switching functionality would be implemented here
+        
+    </script>
+    <script src="legal-summarizer-js.js" defer></script>
+</body>
+</html>
